@@ -129,6 +129,9 @@ def create_team(name: str) -> Team:
     return team
 
 
+app = create_app("production")
+
+
 if __name__ == "__main__":
-    app = create_app("development")
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    development_app = create_app("development")
+    development_app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

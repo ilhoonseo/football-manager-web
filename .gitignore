@@ -67,6 +67,7 @@ ipython_config.py
 
 # pyenv
 .python-version
+!.python-version
 
 # pipenv
 Pipfile.lock
@@ -101,6 +102,7 @@ dmypy.json
 # IDE
 .vscode/
 .idea/
+.vercel/
 *.swp
 *.swo
 
