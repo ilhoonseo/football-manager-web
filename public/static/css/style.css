@@ -209,7 +209,22 @@ label {
   color: #101820;
   font-size: 0.72rem;
   font-weight: 900;
+  line-height: 1.1;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.player span,
+.player small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player small {
+  font-size: 0.62rem;
+  opacity: 0.78;
 }
 
 .GK { background: #7dd3fc; }

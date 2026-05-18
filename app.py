@@ -10,6 +10,63 @@ from team import Team
 
 
 FORMATIONS = {"4-3-3", "4-2-4", "3-5-2", "5-3-2"}
+DEFAULT_TEAM_NAMES = ["이비지니스", "디지털컨텐츠", "웹프로래밍", "해킹방어"]
+STARTING_POSITIONS = [Position.GK, *([Position.DEF] * 4), *([Position.MID] * 3), *([Position.FWD] * 3)]
+
+TEAM_ROSTERS = {
+    "이비지니스": [
+        ("강승진", 82),
+        ("국민우", 80),
+        ("권은진", 81),
+        ("금명구", 79),
+        ("김동현", 83),
+        ("김민성", 78),
+        ("김보균", 80),
+        ("김성근", 82),
+        ("김수환", 81),
+        ("김재환", 79),
+        ("김지수", 84),
+    ],
+    "디지털컨텐츠": [
+        ("김호영", 80),
+        ("남궁곤", 82),
+        ("남준우", 79),
+        ("문원주", 81),
+        ("민성경", 83),
+        ("박경열", 78),
+        ("박대현", 80),
+        ("박병주", 79),
+        ("박상수", 82),
+        ("박정현", 81),
+        ("박치완", 80),
+    ],
+    "웹프로래밍": [
+        ("서일훈", 85),
+        ("신형록", 81),
+        ("유진혁", 80),
+        ("이인혜", 83),
+        ("임준석", 79),
+        ("전영우", 82),
+        ("정락준", 80),
+        ("정우영", 81),
+        ("최서현", 83),
+        ("허재원", 79),
+        ("허정민", 80),
+    ],
+    "해킹방어": [
+        ("홍정웅", 82),
+        ("홍형순", 81),
+        ("양덕모", 80),
+        ("박정진", 83),
+        ("펠레", 96),
+        ("마라도나", 95),
+        ("메시", 97),
+        ("호날두", 96),
+        ("지단", 94),
+        ("호나우지뉴", 93),
+        ("베켄바워", 94),
+    ],
+}
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -28,14 +85,10 @@ def register_routes(app: Flask) -> None:
     @app.post("/api/game/start")
     def start_game():
         game_id = os.urandom(16).hex()
-        player_team = create_team("FC Codex")
-        cpu_teams = [
-            create_team("Seoul Rangers"),
-            create_team("Busan Waves"),
-            create_team("Incheon United"),
-            create_team("Daegu Falcons"),
-        ]
-        league = League([player_team, *cpu_teams])
+        teams = [create_team(team_name) for team_name in DEFAULT_TEAM_NAMES]
+        player_team = teams[0]
+        cpu_teams = teams[1:]
+        league = League(teams)
         app.games[game_id] = {
             "player_team": player_team,
             "cpu_teams": cpu_teams,
@@ -117,13 +170,7 @@ def game_not_found():
 
 def create_team(name: str) -> Team:
     team = Team(name)
-    positions = [Position.GK, *([Position.DEF] * 4), *([Position.MID] * 3), *([Position.FWD] * 3)]
-    first_names = ["민준", "서준", "도윤", "시우", "하준", "주원", "지호", "도현", "준서", "건우", "현우"]
-    last_names = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한"]
-
-    for index, position in enumerate(positions):
-        player_name = f"{last_names[index]}{first_names[index]}"
-        overall = random.randint(64, 90)
+    for position, (player_name, overall) in zip(STARTING_POSITIONS, TEAM_ROSTERS[name]):
         team.add_player(Player(player_name, position, overall))
 
     return team

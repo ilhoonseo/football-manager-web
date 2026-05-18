@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function startGame() {
   const data = await api("/api/game/start", { method: "POST" });
   applyGameState(data);
-  setResult("새 시즌이 시작됐습니다. 전술을 고르고 첫 경기를 진행하세요.");
+  setResult("새 시즌이 시작되었습니다. 전술을 고르고 첫 경기를 진행하세요.");
 }
 
 async function playMatch() {
@@ -71,7 +71,7 @@ async function saveTactics() {
     body: JSON.stringify(payload),
   });
   applyGameState(data);
-  setResult("전술이 저장됐습니다.");
+  setResult("전술을 저장했습니다.");
 }
 
 async function api(url, options) {
@@ -117,7 +117,7 @@ function renderFormation() {
     node.style.left = `${left}%`;
     node.style.top = `${top}%`;
     node.title = `${player.name} / ${player.position} / ${player.overall}`;
-    node.textContent = `${player.position} ${player.overall}`;
+    node.innerHTML = `<span>${player.name}</span><small>${player.position} ${player.overall}</small>`;
     board.appendChild(node);
   });
 }
