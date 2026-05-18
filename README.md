@@ -1,6 +1,6 @@
 # Football Manager Web
 
-Python으로 만든 풋볼 매니저 게임을 Flask 기반 웹 서비스 게임으로 정리한 프로젝트입니다.
+웹 기반 축구 팀 매니징 게임입니다. Python 게임 로직을 Flask API와 HTML/CSS/JavaScript 프런트엔드로 감싸서 브라우저에서 바로 플레이할 수 있게 정리했습니다.
 
 ## 주요 기능
 
@@ -19,6 +19,8 @@ python app.py
 ```
 
 브라우저에서 `http://localhost:5000`으로 접속합니다.
+
+Windows에서는 `풋볼매니저_실행.bat`을 실행해도 됩니다.
 
 ## 프로젝트 구조
 
@@ -46,16 +48,3 @@ python app.py
 - `POST /api/game/<game_id>/formation`: 포메이션과 전술 저장
 - `POST /api/game/<game_id>/match`: 경기 진행
 - `POST /api/game/<game_id>/reset`: 시즌 기록 초기화
-
-## GitHub 관리
-
-처음 업로드할 때:
-
-```bash
-git init
-git add .
-git commit -m "Initial web football manager"
-git branch -M main
-git remote add origin https://github.com/<your-id>/football-manager-web.git
-git push -u origin main
-```
