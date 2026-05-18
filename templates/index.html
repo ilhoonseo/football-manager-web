@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Football Manager Web</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <main id="app">
+    <section class="topbar">
+      <div>
+        <p class="eyebrow">Web Service Game</p>
+        <h1>Football Manager</h1>
+      </div>
+      <div class="actions">
+        <button id="newGameBtn" class="primary">새 게임</button>
+        <button id="matchBtn">경기 진행</button>
+        <button id="resetBtn">시즌 초기화</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel team-panel">
+        <h2 id="teamName">팀 준비 중</h2>
+        <dl class="stats">
+          <div><dt>전적</dt><dd id="record">0승 0무 0패</dd></div>
+          <div><dt>득실</dt><dd id="goals">0 / 0</dd></div>
+          <div><dt>승점</dt><dd id="points">0</dd></div>
+          <div><dt>전력</dt><dd id="strength">0.0</dd></div>
+        </dl>
+
+        <div class="control-group">
+          <label for="formationSelect">포메이션</label>
+          <select id="formationSelect">
+            <option>4-3-3</option>
+            <option>4-2-4</option>
+            <option>3-5-2</option>
+            <option>5-3-2</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="tacticsSelect">전술</label>
+          <select id="tacticsSelect">
+            <option value="balanced">균형</option>
+            <option value="attacking">공격</option>
+            <option value="defensive">수비</option>
+          </select>
+        </div>
+
+        <button id="saveTacticsBtn" class="wide">전술 저장</button>
+      </aside>
+
+      <section class="pitch-wrap">
+        <div class="pitch" aria-label="선발 라인업">
+          <div id="formationBoard" class="formation-board"></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>최근 경기</h2>
+        <div id="matchResult" class="result">새 게임을 시작하세요.</div>
+        <div id="recentMatches" class="match-list"></div>
+      </aside>
+    </section>
+
+    <section class="panel standings-panel">
+      <h2>리그 순위</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>순위</th>
+            <th>팀</th>
+            <th>경기</th>
+            <th>승</th>
+            <th>무</th>
+            <th>패</th>
+            <th>득실</th>
+            <th>승점</th>
+          </tr>
+        </thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>
