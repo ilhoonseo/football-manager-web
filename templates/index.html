@@ -22,6 +22,16 @@
 
     <section class="layout">
       <aside class="panel team-panel">
+        <div class="control-group">
+          <label for="teamSelect">소속팀</label>
+          <select id="teamSelect">
+            <option>이비지니스</option>
+            <option>디지털컨텐츠</option>
+            <option>웹프로래밍</option>
+            <option>해킹방어</option>
+          </select>
+        </div>
+
         <h2 id="teamName">팀 준비 중</h2>
         <dl class="stats">
           <div><dt>전적</dt><dd id="record">0승 0무 0패</dd></div>
@@ -50,6 +60,7 @@
         </div>
 
         <button id="saveTacticsBtn" class="wide">전술 저장</button>
+        <button id="resetLayoutBtn" class="wide subtle">배치 초기화</button>
       </aside>
 
       <section class="pitch-wrap">

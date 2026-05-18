@@ -57,6 +57,11 @@ button.primary {
   border-color: var(--gold);
 }
 
+button.subtle {
+  margin-top: 10px;
+  background: transparent;
+}
+
 #app {
   width: min(1440px, 100%);
   margin: 0 auto;
@@ -193,6 +198,7 @@ label {
   position: absolute;
   inset: 26px;
   z-index: 1;
+  touch-action: none;
 }
 
 .player {
@@ -211,6 +217,17 @@ label {
   font-weight: 900;
   line-height: 1.1;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+
+.player.dragging {
+  cursor: grabbing;
+  transform: scale(1.08);
+  z-index: 5;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.38);
 }
 
 .player span,

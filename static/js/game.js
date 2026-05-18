@@ -3,6 +3,8 @@ const state = {
   playerTeam: null,
   standings: [],
   matchResults: [],
+  selectedTeam: "이비지니스",
+  customPositions: {},
 };
 
 const formationPositions = {
@@ -30,18 +32,30 @@ const resultLabels = {
   loss: "패배",
 };
 
+let activeDrag = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("newGameBtn").addEventListener("click", startGame);
   document.getElementById("matchBtn").addEventListener("click", playMatch);
   document.getElementById("resetBtn").addEventListener("click", resetSeason);
   document.getElementById("saveTacticsBtn").addEventListener("click", saveTactics);
+  document.getElementById("resetLayoutBtn").addEventListener("click", resetLayout);
+  document.getElementById("teamSelect").addEventListener("change", startGame);
+  document.getElementById("formationSelect").addEventListener("change", renderFormation);
   startGame();
 });
 
 async function startGame() {
-  const data = await api("/api/game/start", { method: "POST" });
+  const teamSelect = document.getElementById("teamSelect");
+  state.selectedTeam = teamSelect.value;
+  state.customPositions = {};
+  const data = await api("/api/game/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ team_name: state.selectedTeam }),
+  });
   applyGameState(data);
-  setResult("새 시즌이 시작되었습니다. 전술을 고르고 첫 경기를 진행하세요.");
+  setResult(`${state.playerTeam.name} 소속으로 새 시즌이 시작되었습니다.`);
 }
 
 async function playMatch() {
@@ -88,10 +102,20 @@ function applyGameState(data) {
   state.playerTeam = data.player_team;
   state.standings = data.standings;
   state.matchResults = data.match_results || [];
+  syncTeamOptions(data.team_names || []);
   renderTeam();
   renderFormation();
   renderStandings();
   renderRecentMatches();
+}
+
+function syncTeamOptions(teamNames) {
+  const teamSelect = document.getElementById("teamSelect");
+  if (teamNames.length) {
+    teamSelect.innerHTML = teamNames.map((teamName) => `<option>${teamName}</option>`).join("");
+  }
+  teamSelect.value = state.playerTeam?.name || state.selectedTeam;
+  state.selectedTeam = teamSelect.value;
 }
 
 function renderTeam() {
@@ -106,20 +130,88 @@ function renderTeam() {
 }
 
 function renderFormation() {
+  if (!state.playerTeam) return;
+
   const board = document.getElementById("formationBoard");
   const team = state.playerTeam;
-  const coords = formationPositions[team.formation] || formationPositions["4-3-3"];
+  const formation = document.getElementById("formationSelect").value || team.formation;
+  const coords = getPositionsForFormation(formation);
   board.innerHTML = "";
   team.players.forEach((player, index) => {
     const [left, top] = coords[index];
     const node = document.createElement("div");
     node.className = `player ${player.position}`;
+    node.dataset.index = String(index);
     node.style.left = `${left}%`;
     node.style.top = `${top}%`;
     node.title = `${player.name} / ${player.position} / ${player.overall}`;
     node.innerHTML = `<span>${player.name}</span><small>${player.position} ${player.overall}</small>`;
+    node.addEventListener("pointerdown", startDrag);
     board.appendChild(node);
   });
+}
+
+function getPositionsForFormation(formation) {
+  const defaults = formationPositions[formation] || formationPositions["4-3-3"];
+  const custom = state.customPositions[formation];
+  return custom || defaults;
+}
+
+function startDrag(event) {
+  const playerNode = event.currentTarget;
+  activeDrag = {
+    node: playerNode,
+    pointerId: event.pointerId,
+  };
+  playerNode.classList.add("dragging");
+  playerNode.setPointerCapture(event.pointerId);
+  movePlayer(event, playerNode);
+  window.addEventListener("pointermove", onDragMove);
+  window.addEventListener("pointerup", stopDrag);
+  window.addEventListener("pointercancel", stopDrag);
+}
+
+function onDragMove(event) {
+  if (!activeDrag || activeDrag.pointerId !== event.pointerId) return;
+  movePlayer(event, activeDrag.node);
+}
+
+function stopDrag(event) {
+  if (!activeDrag || activeDrag.pointerId !== event.pointerId) return;
+  const playerNode = activeDrag.node;
+  playerNode.classList.remove("dragging");
+  if (playerNode.hasPointerCapture(event.pointerId)) {
+    playerNode.releasePointerCapture(event.pointerId);
+  }
+  window.removeEventListener("pointermove", onDragMove);
+  window.removeEventListener("pointerup", stopDrag);
+  window.removeEventListener("pointercancel", stopDrag);
+  activeDrag = null;
+}
+
+function movePlayer(event, playerNode) {
+  const board = document.getElementById("formationBoard");
+  const rect = board.getBoundingClientRect();
+  const formation = document.getElementById("formationSelect").value;
+  const index = Number(playerNode.dataset.index);
+  const left = clamp(((event.clientX - rect.left) / rect.width) * 100, 4, 96);
+  const top = clamp(((event.clientY - rect.top) / rect.height) * 100, 4, 96);
+  const current = getPositionsForFormation(formation).map(([x, y]) => [x, y]);
+  current[index] = [left, top];
+  state.customPositions[formation] = current;
+  playerNode.style.left = `${left}%`;
+  playerNode.style.top = `${top}%`;
+}
+
+function resetLayout() {
+  const formation = document.getElementById("formationSelect").value;
+  delete state.customPositions[formation];
+  renderFormation();
+  setResult(`${formation} 배치를 기본 위치로 되돌렸습니다.`);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function renderStandings() {

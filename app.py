@@ -84,10 +84,15 @@ def register_routes(app: Flask) -> None:
 
     @app.post("/api/game/start")
     def start_game():
+        data = request.get_json(silent=True) or {}
+        selected_team_name = data.get("team_name") or DEFAULT_TEAM_NAMES[0]
+        if selected_team_name not in DEFAULT_TEAM_NAMES:
+            return jsonify({"success": False, "error": "지원하지 않는 소속팀입니다."}), 400
+
         game_id = os.urandom(16).hex()
         teams = [create_team(team_name) for team_name in DEFAULT_TEAM_NAMES]
-        player_team = teams[0]
-        cpu_teams = teams[1:]
+        player_team = next(team for team in teams if team.name == selected_team_name)
+        cpu_teams = [team for team in teams if team.name != selected_team_name]
         league = League(teams)
         app.games[game_id] = {
             "player_team": player_team,
@@ -156,6 +161,7 @@ def game_payload(game_id: str, game: dict) -> dict:
     return {
         "success": True,
         "game_id": game_id,
+        "team_names": DEFAULT_TEAM_NAMES,
         "player_team": game["player_team"].to_dict(),
         "standings": game["league"].get_standings_dict(),
         "match_results": game["match_results"][:6],
